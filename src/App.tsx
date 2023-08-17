@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useContext } from 'react';
 import imgLogin from './assets/flat-login.png';
-import { Login } from './components/Login';
-import { Register } from './components/Register';
+import { AppContext, AppContextType } from './contexts';
+import { Login } from './pages/Login';
+import { Signup } from './pages/Signup';
 
 function App() {
-  const [isSingIn, setIsSignIn] = useState<boolean>(true);
+  const { isSingIn } = useContext(AppContext) as AppContextType;
   return (
     <div className="app flex w-[100vw] h-[100vh] items-center justify-center overflow-x-hidden">
       <div className="content flex flex-col lg:flex-row bg-inherit lg:w-8/12 xl:w-6/12 justify-center">
@@ -15,11 +16,7 @@ function App() {
             className="w-full max-w-xs lg:max-w-none "
           />
         </div>
-        {isSingIn ? (
-          <Login isSingIn={isSingIn} setIsSignIn={setIsSignIn} />
-        ) : (
-          <Register isSingIn={isSingIn} setIsSignIn={setIsSignIn} />
-        )}
+        {isSingIn ? <Login /> : <Signup />}
       </div>
     </div>
   );

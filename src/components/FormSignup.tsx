@@ -1,18 +1,18 @@
 import { ChangeEvent, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { FormProps } from '../types/CommonTypes';
-import { authService } from '../services/auth';
+import { userService } from '../services/user';
 
-type LoginForm = {
+type SignupForm = {
+  name: string;
   email: string;
   password: string;
-  code: string;
 };
-export function Login({ isSingIn, setIsSignIn }: FormProps) {
-  const [data, setData] = useState<LoginForm>({
+export function FormSignup({ isSingIn, setIsSignIn }: FormProps) {
+  const [qrCode, setQrCode] = useState<string>('');
+  const [data, setData] = useState<SignupForm>({
+    name: '',
     email: '',
     password: '',
-    code: '',
   });
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -25,21 +25,22 @@ export function Login({ isSingIn, setIsSignIn }: FormProps) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await authService
-      .auth(data.email, data.password, data.code)
+    await userService
+      .createUser(data.name, data.email, data.password)
       .then((res) => {
-        console.log('res', res);
+        setQrCode(res.qrCode);
         alert(res.message);
       })
       .catch((error) => {
         console.log('error', error);
       });
   };
+
   return (
-    <div className="p-3 lg:w-2/4 bg-white lg:rounded-r-lg form-right  ">
+    <div className="p-3 lg:w-2/4 bg-white lg:rounded-r-lg form-right">
       <div className="flex items-center flex-col px-1 py-2">
         <h2 className="text-[#1A1B40] text-2xl font-bold text-center">
-          Login Account
+          Register Account
         </h2>
         <span className="text-center pt-1 text-sm">
           Lorem ipsum dolor sit amet consectetur adipisicing elit.
@@ -68,6 +69,23 @@ export function Login({ isSingIn, setIsSignIn }: FormProps) {
         </div>
       </div>
       <form method="POST" className="p-2" onSubmit={handleSubmit}>
+        <div className="flex flex-col w-100 h-100">
+          <label
+            htmlFor="name"
+            className="font-semibold text-dark py-1 text-base"
+          >
+            Nome
+          </label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            placeholder="Digite seu nome..."
+            className="p-2.5 rounded bg-[#f5f5f5] text-[#c2c2c2] outline-0"
+            onChange={handleInputChange}
+            value={data.name}
+          />
+        </div>
         <div className="flex flex-col">
           <label
             htmlFor="email"
@@ -102,37 +120,17 @@ export function Login({ isSingIn, setIsSignIn }: FormProps) {
             value={data.password}
           />
         </div>
-        <div className="flex flex-col">
-          <label
-            htmlFor="password"
-            className="font-semibold text-dark py-1 text-base"
+        <div className="flex flex-col pt-4 text-sm space-y-4 ">
+          <button
+            className=" w-full bg-emerald-500 rounded text-white p-3 font-semibold hover:opacity-80 shadow-sm text-base"
+            type="submit"
           >
-            Verificação de duas etapas (2FA)
-          </label>
-          <input
-            type="text"
-            name="code"
-            id="code"
-            placeholder="Digite o código..."
-            className="p-2.5 rounded bg-[#f5f5f5] text-[#c2c2c2] outline-0"
-            onChange={handleInputChange}
-            value={data.code}
-          />
-        </div>
-        <div className="flex flex-col pt-2 text-sm space-y-4 ">
-          <Link
-            to={'#'}
-            className="text-right text-[#696eff] font-medium text-sm hover:underline"
-          >
-            Esqueceu a senha?
-          </Link>
-          <button className=" w-full bg-emerald-500 rounded text-white p-3 font-semibold hover:opacity-80 shadow-sm text-base">
             Enviar
           </button>
         </div>
         <div className="flex items-center justify-center pt-5">
           <span className="text-[#afb0ab] text-sm">
-            © 2023 Todos os direitos reservados
+            Copyright © 2023 - Todos os direitos reservados
           </span>
         </div>
       </form>
