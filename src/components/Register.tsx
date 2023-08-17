@@ -1,6 +1,41 @@
+import { ChangeEvent, useState } from 'react';
 import { FormProps } from '../types/CommonTypes';
+import { userService } from '../services/user';
 
+type RegisterForm = {
+  name: string;
+  email: string;
+  password: string;
+};
 export function Register({ isSingIn, setIsSignIn }: FormProps) {
+  const [qrCode, setQrCode] = useState<string>('');
+  const [data, setData] = useState<RegisterForm>({
+    name: '',
+    email: '',
+    password: '',
+  });
+
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await userService
+      .createUser(data.name, data.email, data.password)
+      .then((res) => {
+        setQrCode(res.qrCode);
+        alert(res.message);
+      })
+      .catch((error) => {
+        console.log('error', error);
+      });
+  };
+
   return (
     <div className="p-3 lg:w-2/4 bg-white lg:rounded-r-lg form-right">
       <div className="flex items-center flex-col px-1 py-2">
@@ -33,7 +68,7 @@ export function Register({ isSingIn, setIsSignIn }: FormProps) {
           </button>
         </div>
       </div>
-      <form method="POST" className="p-2">
+      <form method="POST" className="p-2" onSubmit={handleSubmit}>
         <div className="flex flex-col w-100 h-100">
           <label
             htmlFor="name"
@@ -47,6 +82,8 @@ export function Register({ isSingIn, setIsSignIn }: FormProps) {
             id="name"
             placeholder="Digite seu nome..."
             className="p-2.5 rounded bg-[#f5f5f5] text-[#c2c2c2] outline-0"
+            onChange={handleInputChange}
+            value={data.name}
           />
         </div>
         <div className="flex flex-col">
@@ -62,6 +99,8 @@ export function Register({ isSingIn, setIsSignIn }: FormProps) {
             id="email"
             placeholder="Digite seu e-mail..."
             className="w-100 p-2.5 rounded bg-[#f5f5f5] text-[#c2c2c2] outline-0"
+            onChange={handleInputChange}
+            value={data.email}
           />
         </div>
         <div className="flex flex-col">
@@ -77,10 +116,15 @@ export function Register({ isSingIn, setIsSignIn }: FormProps) {
             id="password"
             placeholder="Digite sua senha..."
             className="p-2.5 rounded bg-[#f5f5f5] text-[#c2c2c2] outline-0"
+            onChange={handleInputChange}
+            value={data.password}
           />
         </div>
         <div className="flex flex-col pt-4 text-sm space-y-4 ">
-          <button className=" w-full bg-emerald-500 rounded text-white p-3 font-semibold hover:opacity-80 shadow-sm text-base">
+          <button
+            className=" w-full bg-emerald-500 rounded text-white p-3 font-semibold hover:opacity-80 shadow-sm text-base"
+            type="submit"
+          >
             Enviar
           </button>
         </div>
