@@ -8,3 +8,28 @@
   border: 0;
   box-sizing: border-box;
 }
+.app {
+  background: linear-gradient(to left, #b5b8ff 50%, #696eff 50%);
+}
+.form-left {
+  background: linear-gradient(to right, #8f94fb, #4e54c8);
+}
+
+@media (max-width: 400px) {
+  .form-right .form-left {
+    width: 300px;
+  }
+  .form-btns button {
+    width: 100px;
+  }
+}
+@media (max-width: 1023px) {
+  .form-right {
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+  }
+  .form-left {
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+  }
+}
