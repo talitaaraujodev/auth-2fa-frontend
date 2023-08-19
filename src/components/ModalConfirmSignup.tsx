@@ -22,7 +22,7 @@ export function ModalConfirmSignup({
         <h2 className="font-semibold text-2xl py-1.5 text-[#696eff] pb-5">
           Configuração 2FA
         </h2>
-        <div className="flex flex-row">
+        <div className="flex lg:flex-row flex-col">
           <div className="flex flex-col">
             <span className="text-base text-left text-[#585454]">
               Baixe o aplicativo do Google Authenticator em sua loja de
@@ -30,12 +30,15 @@ export function ModalConfirmSignup({
             </span>
             <img
               alt="Imagem loja de aplicativo"
-              width={200}
-              height={200}
+              className="w-[140px] lg:w-[200px]"
               src={ImgStoreApp}
             />
           </div>
-          <img alt="Imagem qrCode" src={qrCode} />
+          <img
+            alt="Imagem qrCode"
+            src={qrCode}
+            className="w-[140px] h-[140px] lg:w-[200px] lg:h-[200px]"
+          />
         </div>
 
         <label
@@ -51,7 +54,6 @@ export function ModalConfirmSignup({
               key={index}
               type="text"
               name="code"
-              id="code"
               maxLength={1}
               onChange={(e) => handleOtpChange(e.target.value, index)}
               ref={inputsRef[index]}

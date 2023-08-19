@@ -59,6 +59,7 @@
   .modal-content {
     width: 500px;
   }
+ 
 }
 @media (max-width: 500px) {
   .modal-content {

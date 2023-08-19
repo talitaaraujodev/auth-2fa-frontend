@@ -146,6 +146,7 @@ export function FormLogin() {
           <input
             type="password"
             name="password"
+            autoComplete="current-password"
             id="password"
             placeholder="Digite sua senha..."
             className="p-2.5 rounded bg-[#f5f5f5] text-[#c2c2c2] outline-0 border"

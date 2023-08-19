@@ -37,7 +37,6 @@ export function ModalConfirmLogin({
               key={index}
               type="text"
               name="code"
-              id="code"
               maxLength={1}
               onChange={(e) => handleOtpChange(e.target.value, index)}
               ref={inputsRef[index]}
