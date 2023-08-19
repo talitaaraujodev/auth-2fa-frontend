@@ -1,21 +1,29 @@
-import React, { ChangeEvent, useState } from 'react';
-import { FormProps } from '../types/CommonTypes';
+import { ChangeEvent, useState, useRef, useContext } from 'react';
 import { userService } from '../services/user';
+import { utils } from '../utils';
+import { ModalConfirmSignup } from './ModalConfirmSignup';
+import { AppContext, AppContextType } from '../contexts';
 
 type SignupForm = {
   name: string;
   email: string;
   password: string;
 };
-export function FormSignup({ isSingIn, setIsSignIn }: FormProps) {
+export function FormSignup() {
   const [qrCode, setQrCode] = useState<string>('');
   const [secret, setSecret] = useState<string>('');
-  const [openModalConfirm, setOpenModalConfirm] = useState<boolean>(false);
+  const [showModalConfirmSignup, setShowModalConfirmSignup] =
+    useState<boolean>(false);
   const [data, setData] = useState<SignupForm>({
     name: '',
     email: '',
     password: '',
   });
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [activeInput, setActiveInput] = useState(0);
+
+  const { isSingIn, setIsSignIn } = useContext(AppContext) as AppContextType;
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -25,9 +33,8 @@ export function FormSignup({ isSingIn, setIsSignIn }: FormProps) {
     }));
   };
 
-  const generateQrCode = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    userService
+  const generateQrCode = async () => {
+    await userService
       .generateSecret()
       .then((res) => {
         setSecret(res.secret);
@@ -38,17 +45,57 @@ export function FormSignup({ isSingIn, setIsSignIn }: FormProps) {
       });
   };
 
-  const handleSubmit = async (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
+  const sendSignup = async () => {
+    setIsLoading(true);
+    const code = otp.join('');
     await userService
-      .createUser(data.name, data.email, data.password)
+      .createUser(data.name, data.email, data.password, secret, code)
       .then((res) => {
-        setQrCode(res.qrCode);
-        alert(res.message);
+        const errors = res.errors;
+        if (errors) {
+          setIsLoading(false);
+          errors.forEach((field: any, index: any) => {
+            const keys = Object.keys(field);
+            utils.errorMessage(`${field[keys[index]]}`);
+          });
+          return;
+        }
+        setIsLoading(false);
+        setShowModalConfirmSignup(false);
+        setIsSignIn(true);
+        utils.successMessage('Usuário criado com sucesso.');
+        return;
       })
       .catch((error) => {
+        setIsLoading(false);
         console.log('error', error);
       });
+  };
+
+  async function openModalConfirmSignup() {
+    if (data.name === '' || data.email === '' || data.password === '') {
+      utils.errorMessage('Nome, e-mail e senha são campos obrigatórios.');
+    } else {
+      await generateQrCode();
+      setShowModalConfirmSignup(!showModalConfirmSignup);
+    }
+  }
+  function closeModalConfirmSignup() {
+    setShowModalConfirmSignup(false);
+  }
+  const inputsRef = otp.map(() => useRef<HTMLInputElement | null>(null));
+  const handleOtpChange = (value: any, index: any) => {
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    if (value && index < newOtp.length - 1) {
+      setActiveInput(index + 1);
+      inputsRef[index + 1].current.focus();
+    } else if (!value && index > 0) {
+      setActiveInput(index - 1);
+      inputsRef[index - 1].current.focus();
+    }
   };
 
   return (
@@ -139,6 +186,7 @@ export function FormSignup({ isSingIn, setIsSignIn }: FormProps) {
           <button
             className=" w-full bg-emerald-500 rounded text-white p-3 font-semibold hover:opacity-80 shadow-sm text-base"
             type="button"
+            onClick={() => openModalConfirmSignup()}
           >
             Enviar
           </button>
@@ -149,6 +197,17 @@ export function FormSignup({ isSingIn, setIsSignIn }: FormProps) {
           </span>
         </div>
       </form>
+      <ModalConfirmSignup
+        openModalConfirmSignup={showModalConfirmSignup}
+        closeModalConfirmSignup={closeModalConfirmSignup}
+        handleOtpChange={handleOtpChange}
+        sendSignup={sendSignup}
+        activeInput={activeInput}
+        inputsRef={inputsRef}
+        otp={otp}
+        loading={isLoading}
+        qrCode={qrCode}
+      />
     </div>
   );
 }

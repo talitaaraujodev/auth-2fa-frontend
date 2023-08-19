@@ -1,23 +1,21 @@
-import { ModalConfirmProps } from '../types/CommonTypes';
+import { ModalConfirmLoginProps } from '../types/CommonTypes';
 import { Modal } from './Modal';
 import { BiSolidLock } from 'react-icons/bi';
 
-export function ModalConfirm({
-  openModalConfirm,
-  closeModalConfirm,
+export function ModalConfirmLogin({
+  openModalConfirmLogin,
+  closeModalConfirmLogin,
   otp,
   inputsRef,
   activeInput,
   handleOtpChange,
   sendLogin,
   loading,
-}: ModalConfirmProps) {
+}: ModalConfirmLoginProps) {
   return (
     <Modal
-      closeModal={() => {
-        closeModalConfirm();
-      }}
-      openModal={openModalConfirm}
+      closeModal={closeModalConfirmLogin}
+      openModal={openModalConfirmLogin}
     >
       <div className="flex flex-col items-center justify-center">
         <BiSolidLock
@@ -26,9 +24,9 @@ export function ModalConfirm({
           className="bg-[#eb245a] rounded-full  p-[0.4rem]"
         />
         <h2 className="font-semibold text-2xl py-1.5">
-          Verificação de Segurança
+          Verificação de Segurança 2FA
         </h2>
-        <span className="text-base text-center">
+        <span className="text-base text-center text-[#585454]">
           Digite o PIN gerado pelo Google Authenticator para prosseguir com a
           autenticação.
         </span>

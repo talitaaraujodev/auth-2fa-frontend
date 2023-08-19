@@ -1,23 +1,26 @@
-import { ChangeEvent, useState, useRef } from 'react';
+import { ChangeEvent, useState, useRef, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { FormProps } from '../types/CommonTypes';
 import { authService } from '../services/auth';
-import { ModalConfirm } from './ModalConfirm';
+import { ModalConfirmLogin } from './ModalConfirmLogin';
 import { utils } from '../utils';
+import { AppContext, AppContextType } from '../contexts';
 
 type LoginForm = {
   email: string;
   password: string;
 };
-export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
+export function FormLogin() {
   const [data, setData] = useState<LoginForm>({
     email: '',
     password: '',
   });
-  const [otp, setOtp] = useState(['', '', '', '']);
-  const [showModalConfirm, setShowModalConfirm] = useState<boolean>(false);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [showModalConfirmLogin, setShowModalConfirmLogin] =
+    useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [activeInput, setActiveInput] = useState(0);
+
+  const { isSingIn, setIsSignIn } = useContext(AppContext) as AppContextType;
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -44,6 +47,7 @@ export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
         }
         setIsLoading(false);
         utils.successMessage('Usuário logado com sucesso.');
+        setShowModalConfirmLogin(false);
         return;
       })
       .catch((error) => {
@@ -71,16 +75,15 @@ export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
     }
   };
 
-  function openModalConfirm() {
+  function openModalConfirmLogin() {
     if (data.email === '' || data.password === '') {
       utils.errorMessage('E-mail e senha são campos obrigatórios.');
     } else {
-      setShowModalConfirm(!showModalConfirm);
+      setShowModalConfirmLogin(!showModalConfirmLogin);
     }
   }
-  function closeModalConfirm() {
-    setShowModalConfirm(false);
-    setOtp(['', '', '', '']);
+  function closeModalConfirmLogin() {
+    setShowModalConfirmLogin(false);
   }
 
   return (
@@ -160,7 +163,7 @@ export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
           </Link>
           <button
             className=" w-full bg-emerald-500 rounded text-white p-3 font-semibold hover:opacity-80 shadow-sm text-base"
-            onClick={() => openModalConfirm()}
+            onClick={() => openModalConfirmLogin()}
             type="button"
           >
             Logar
@@ -172,9 +175,9 @@ export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
           </span>
         </div>
       </form>
-      <ModalConfirm
-        openModalConfirm={showModalConfirm}
-        closeModalConfirm={closeModalConfirm}
+      <ModalConfirmLogin
+        openModalConfirmLogin={showModalConfirmLogin}
+        closeModalConfirmLogin={closeModalConfirmLogin}
         handleOtpChange={handleOtpChange}
         sendLogin={sendLogin}
         activeInput={activeInput}
