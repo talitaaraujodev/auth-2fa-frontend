@@ -17,6 +17,7 @@ export function ModalConfirmSignup({
     <Modal
       closeModal={closeModalConfirmSignup}
       openModal={openModalConfirmSignup}
+      style={'my-[9%] mx-auto'}
     >
       <div className="flex flex-col justify-center">
         <h2 className="font-semibold text-2xl py-1.5 text-[#696eff] pb-5">

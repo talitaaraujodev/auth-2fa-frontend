@@ -1,6 +1,7 @@
 export type ModalProps = {
   openModal: boolean;
   closeModal: () => void;
+  style: string;
   children: React.ReactNode;
 };
 

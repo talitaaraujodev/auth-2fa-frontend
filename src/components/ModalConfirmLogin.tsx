@@ -16,6 +16,7 @@ export function ModalConfirmLogin({
     <Modal
       closeModal={closeModalConfirmLogin}
       openModal={openModalConfirmLogin}
+      style={'my-[14%] mx-auto'}
     >
       <div className="flex flex-col items-center justify-center">
         <BiSolidLock

@@ -1,12 +1,14 @@
 import { CgClose } from 'react-icons/cg';
 import { ModalProps } from '../types/CommonTypes';
 
-export function Modal({ children, openModal, closeModal }: ModalProps) {
+export function Modal({ children, openModal, closeModal, style }: ModalProps) {
   return (
     <div className={`${openModal ? 'modal' : 'invisible hidden'}`}>
       <div
         className={`${
-          openModal ? 'modal-content rounded shadow-md' : 'invisible hidden'
+          openModal
+            ? `modal-content rounded shadow-md ${style}`
+            : 'invisible hidden'
         }`}
       >
         <div className="flex items-center justify-end">
