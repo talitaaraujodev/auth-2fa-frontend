@@ -1,19 +1,21 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FormProps } from '../types/CommonTypes';
 import { authService } from '../services/auth';
+import { ModalConfirm } from './ModalConfirm';
 
 type LoginForm = {
   email: string;
   password: string;
-  code: string;
 };
 export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
   const [data, setData] = useState<LoginForm>({
     email: '',
     password: '',
-    code: '',
   });
+  const [otp, setOtp] = useState(['', '', '', '']);
+  const [showModalConfirm, setShowModalConfirm] = useState<boolean>(false);
+  const [activeInput, setActiveInput] = useState(0);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -25,8 +27,9 @@ export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const code = otp.join('');
     await authService
-      .auth(data.email, data.password, data.code)
+      .auth(data.email, data.password, code)
       .then((res) => {
         console.log('res', res);
         alert(res.message);
@@ -35,6 +38,30 @@ export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
         console.log('error', error);
       });
   };
+
+  const inputsRef = otp.map(() => useRef<HTMLInputElement | null>(null));
+
+  const handleOtpChange = (value: any, index: any) => {
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    if (value && index < newOtp.length - 1) {
+      setActiveInput(index + 1);
+      inputsRef[index + 1].current.focus();
+    } else if (!value && index > 0) {
+      setActiveInput(index - 1);
+      inputsRef[index - 1].current.focus();
+    }
+  };
+
+  function openModalConfirm() {
+    setShowModalConfirm(!showModalConfirm);
+  }
+  function closeModalConfirm() {
+    setShowModalConfirm(false);
+  }
+
   return (
     <div className="p-3 lg:w-2/4 bg-white lg:rounded-r-lg form-right  ">
       <div className="flex items-center flex-col px-1 py-2">
@@ -67,7 +94,7 @@ export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
           </button>
         </div>
       </div>
-      <form method="POST" className="p-2" onSubmit={handleSubmit}>
+      <form method="POST" className="p-2">
         <div className="flex flex-col">
           <label
             htmlFor="email"
@@ -85,7 +112,7 @@ export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
             value={data.email}
           />
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col ">
           <label
             htmlFor="password"
             className="font-semibold text-dark py-1 text-base"
@@ -97,28 +124,12 @@ export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
             name="password"
             id="password"
             placeholder="Digite sua senha..."
-            className="p-2.5 rounded bg-[#f5f5f5] text-[#c2c2c2] outline-0"
+            className="p-2.5 rounded bg-[#f5f5f5] text-[#c2c2c2] outline-0 border"
             onChange={handleInputChange}
             value={data.password}
           />
         </div>
-        <div className="flex flex-col">
-          <label
-            htmlFor="password"
-            className="font-semibold text-dark py-1 text-base"
-          >
-            Verificação de duas etapas (2FA)
-          </label>
-          <input
-            type="text"
-            name="code"
-            id="code"
-            placeholder="Digite o código..."
-            className="p-2.5 rounded bg-[#f5f5f5] text-[#c2c2c2] outline-0"
-            onChange={handleInputChange}
-            value={data.code}
-          />
-        </div>
+
         <div className="flex flex-col pt-2 text-sm space-y-4 ">
           <Link
             to={'#'}
@@ -126,7 +137,11 @@ export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
           >
             Esqueceu a senha?
           </Link>
-          <button className=" w-full bg-emerald-500 rounded text-white p-3 font-semibold hover:opacity-80 shadow-sm text-base">
+          <button
+            className=" w-full bg-emerald-500 rounded text-white p-3 font-semibold hover:opacity-80 shadow-sm text-base"
+            onClick={() => openModalConfirm()}
+            type="button"
+          >
             Enviar
           </button>
         </div>
@@ -136,6 +151,14 @@ export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
           </span>
         </div>
       </form>
+      <ModalConfirm
+        openModalConfirm={showModalConfirm}
+        closeModalConfirm={closeModalConfirm}
+        handleOtpChange={handleOtpChange}
+        activeInput={activeInput}
+        inputsRef={inputsRef}
+        otp={otp}
+      />
     </div>
   );
 }

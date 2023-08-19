@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { FormProps } from '../types/CommonTypes';
 import { userService } from '../services/user';
 
@@ -9,6 +9,8 @@ type SignupForm = {
 };
 export function FormSignup({ isSingIn, setIsSignIn }: FormProps) {
   const [qrCode, setQrCode] = useState<string>('');
+  const [secret, setSecret] = useState<string>('');
+  const [openModalConfirm, setOpenModalConfirm] = useState<boolean>(false);
   const [data, setData] = useState<SignupForm>({
     name: '',
     email: '',
@@ -23,7 +25,20 @@ export function FormSignup({ isSingIn, setIsSignIn }: FormProps) {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const generateQrCode = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    userService
+      .generateSecret()
+      .then((res) => {
+        setSecret(res.secret);
+        setQrCode(res.qrCode);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleSubmit = async (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     await userService
       .createUser(data.name, data.email, data.password)
@@ -68,7 +83,7 @@ export function FormSignup({ isSingIn, setIsSignIn }: FormProps) {
           </button>
         </div>
       </div>
-      <form method="POST" className="p-2" onSubmit={handleSubmit}>
+      <form method="POST" className="p-2">
         <div className="flex flex-col w-100 h-100">
           <label
             htmlFor="name"
@@ -123,7 +138,7 @@ export function FormSignup({ isSingIn, setIsSignIn }: FormProps) {
         <div className="flex flex-col pt-4 text-sm space-y-4 ">
           <button
             className=" w-full bg-emerald-500 rounded text-white p-3 font-semibold hover:opacity-80 shadow-sm text-base"
-            type="submit"
+            type="button"
           >
             Enviar
           </button>

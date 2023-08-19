@@ -13,5 +13,8 @@ export type ModalProps = {
 export type ModalConfirmProps = {
   openModalConfirm: boolean;
   closeModalConfirm: () => void;
-  qrCode: string;
+  otp: string[];
+  inputsRef: any;
+  activeInput: number;
+  handleOtpChange: (value: string, index: number) => void;
 };

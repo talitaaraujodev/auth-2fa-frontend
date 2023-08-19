@@ -9,4 +9,7 @@ export const userService = {
     };
     return fetch('POST', '/users', data);
   },
+  async generateSecret() {
+    return fetch('GET', '/mfa');
+  },
 };
