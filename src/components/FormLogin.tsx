@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FormProps } from '../types/CommonTypes';
 import { authService } from '../services/auth';
 import { ModalConfirm } from './ModalConfirm';
+import { utils } from '../utils';
 
 type LoginForm = {
   email: string;
@@ -15,6 +16,7 @@ export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
   });
   const [otp, setOtp] = useState(['', '', '', '']);
   const [showModalConfirm, setShowModalConfirm] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [activeInput, setActiveInput] = useState(0);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -25,17 +27,31 @@ export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const sendLogin = async () => {
     const code = otp.join('');
+    setIsLoading(true);
     await authService
       .auth(data.email, data.password, code)
       .then((res) => {
-        console.log('res', res);
-        alert(res.message);
+        const errors = res.errors;
+        if (errors) {
+          setIsLoading(false);
+          errors.forEach((field: any, index: any) => {
+            const keys = Object.keys(field);
+            utils.errorMessage(`${field[keys[index]]}`);
+          });
+          return;
+        }
+        setIsLoading(false);
+        utils.successMessage('Usuário logado com sucesso.');
+        return;
       })
       .catch((error) => {
-        console.log('error', error);
+        console.log(error);
+        setIsLoading(false);
+        utils.errorMessage(
+          'Ocorreram erros ao fazer a autenticação, tente novamente.'
+        );
       });
   };
 
@@ -56,10 +72,15 @@ export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
   };
 
   function openModalConfirm() {
-    setShowModalConfirm(!showModalConfirm);
+    if (data.email === '' || data.password === '') {
+      utils.errorMessage('E-mail e senha são campos obrigatórios.');
+    } else {
+      setShowModalConfirm(!showModalConfirm);
+    }
   }
   function closeModalConfirm() {
     setShowModalConfirm(false);
+    setOtp(['', '', '', '']);
   }
 
   return (
@@ -142,7 +163,7 @@ export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
             onClick={() => openModalConfirm()}
             type="button"
           >
-            Enviar
+            Logar
           </button>
         </div>
         <div className="flex items-center justify-center pt-5">
@@ -155,9 +176,11 @@ export function FormLogin({ isSingIn, setIsSignIn }: FormProps) {
         openModalConfirm={showModalConfirm}
         closeModalConfirm={closeModalConfirm}
         handleOtpChange={handleOtpChange}
+        sendLogin={sendLogin}
         activeInput={activeInput}
         inputsRef={inputsRef}
         otp={otp}
+        loading={isLoading}
       />
     </div>
   );

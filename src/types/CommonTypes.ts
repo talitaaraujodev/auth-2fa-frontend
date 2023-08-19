@@ -17,4 +17,6 @@ export type ModalConfirmProps = {
   inputsRef: any;
   activeInput: number;
   handleOtpChange: (value: string, index: number) => void;
+  sendLogin: () => void;
+  loading: boolean;
 };

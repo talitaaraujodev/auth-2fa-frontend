@@ -9,6 +9,8 @@ export function ModalConfirm({
   inputsRef,
   activeInput,
   handleOtpChange,
+  sendLogin,
+  loading,
 }: ModalConfirmProps) {
   return (
     <Modal
@@ -19,17 +21,21 @@ export function ModalConfirm({
     >
       <div className="flex flex-col items-center justify-center">
         <BiSolidLock
-          size={38}
+          size={45}
           color="#fff"
           className="bg-[#eb245a] rounded-full  p-[0.4rem]"
         />
-        <h2 className="font-semibold text-2xl py-1.5">Verificação 2FA</h2>
-        <span className="text-base">
-          Digite o código para prosseguir com a autenticação
+        <h2 className="font-semibold text-2xl py-1.5">
+          Verificação de Segurança
+        </h2>
+        <span className="text-base text-center">
+          Digite o PIN gerado pelo Google Authenticator para prosseguir com a
+          autenticação.
         </span>
         <div className="flex flex-row">
           {otp.map((digit: any, index: any) => (
             <input
+              required
               key={index}
               type="text"
               name="code"
@@ -44,8 +50,14 @@ export function ModalConfirm({
             />
           ))}
         </div>
-        <button className="w-36 bg-emerald-500 rounded text-white p-2 mt-4 font-semibold text-center hover:opacity-80  text-base">
-          Verificar
+        <button
+          className="w-36 bg-emerald-500 rounded text-white p-2 mt-4 font-semibold text-center hover:opacity-80  text-base"
+          onClick={(e) => {
+            e.stopPropagation();
+            sendLogin();
+          }}
+        >
+          {loading ? 'Verificando...' : 'Verificar'}
         </button>
       </div>
     </Modal>

@@ -48,10 +48,25 @@
   overflow: hidden;
 }
 .modal-content {
-  width: 500px;
+  width: 560px;
   margin: 15% auto;
   background-color: #fff;
   position: relative;
   transition: inherit;
   padding: 1rem;
+}
+@media (max-width: 600px) {
+  .modal-content {
+    width: 500px;
+  }
+}
+@media (max-width: 500px) {
+  .modal-content {
+    width: 400px;
+  }
+}
+@media (max-width: 400px) {
+  .modal-content {
+    width: 320px;
+  }
 }
