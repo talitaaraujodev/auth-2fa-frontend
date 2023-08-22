@@ -28,25 +28,25 @@ npm run dev
 ### Login
 
 <p align="center">
-    <img alt="Documentação" src="./src/assets/login.png"/>
+    <img alt="Documentação" src="./src/docs/images/login.png"/>
 </p>
 
 ### Modal de Confirmação Login
 
 <p align="center">
-    <img alt="Documentação" src="./src/assets/confirm-login.png"/>
+    <img alt="Documentação" src="./src/docs/images/confirm-login.png"/>
 </p>
 
 ### Register
 
 <p align="center">
-    <img alt="Documentação" src="./src/assets/register.png"/>
+    <img alt="Documentação" src="./src/docs/images/register.png"/>
 </p>
 
 ### Modal de Confirmação Register
 
 <p align="center">
-    <img alt="Documentação" src="./src/assets/confirm-register.png"/>
+    <img alt="Documentação" src="./src/docs/images/confirm-register.png"/>
 </p>
 
 By Talita Araujo :wink::purple_heart:
