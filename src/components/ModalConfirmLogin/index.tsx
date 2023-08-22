@@ -1,5 +1,5 @@
-import { ModalConfirmLoginProps } from '../types/CommonTypes';
-import { Modal } from './Modal';
+import { ModalConfirmLoginProps } from '../../types/CommonTypes';
+import { Modal } from '../Modal';
 import { BiSolidLock } from 'react-icons/bi';
 
 export function ModalConfirmLogin({

@@ -1,5 +1,5 @@
 import { CgClose } from 'react-icons/cg';
-import { ModalProps } from '../types/CommonTypes';
+import { ModalProps } from '../../types/CommonTypes';
 
 export function Modal({ children, openModal, closeModal, style }: ModalProps) {
   return (

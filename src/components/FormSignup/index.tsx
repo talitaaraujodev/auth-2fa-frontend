@@ -1,22 +1,25 @@
 import { ChangeEvent, useState, useRef, useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { authService } from '../services/auth';
-import { ModalConfirmLogin } from './ModalConfirmLogin';
-import { utils } from '../utils';
-import { AppContext, AppContextType } from '../contexts';
+import { userService } from '../../services/user';
+import { utils } from '../../utils';
+import { ModalConfirmSignup } from '../ModalConfirmSignup';
+import { AppContext, AppContextType } from '../../contexts';
 
-type LoginForm = {
+type SignupForm = {
+  name: string;
   email: string;
   password: string;
 };
-export function FormLogin() {
-  const [data, setData] = useState<LoginForm>({
+export function FormSignup() {
+  const [qrCode, setQrCode] = useState<string>('');
+  const [secret, setSecret] = useState<string>('');
+  const [showModalConfirmSignup, setShowModalConfirmSignup] =
+    useState<boolean>(false);
+  const [data, setData] = useState<SignupForm>({
+    name: '',
     email: '',
     password: '',
   });
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [showModalConfirmLogin, setShowModalConfirmLogin] =
-    useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [activeInput, setActiveInput] = useState(0);
 
@@ -30,37 +33,61 @@ export function FormLogin() {
     }));
   };
 
-  const sendLogin = async () => {
-    const code = otp.join('');
+  const generateQrCode = async () => {
+    await userService
+      .generateSecret()
+      .then((res) => {
+        setSecret(res.secret);
+        setQrCode(res.qrCode);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const sendSignup = async () => {
     setIsLoading(true);
-    await authService
-      .auth(data.email, data.password, code)
+    const code = otp.join('');
+    await userService
+      .createUser(data.name, data.email, data.password, secret, code)
       .then((res) => {
         const errors = res.errors;
         if (errors) {
           setIsLoading(false);
           errors.forEach((field: any, index: any) => {
             const keys = Object.keys(field);
+            if (keys[0] === 'token' || keys[0] === 'secret') {
+              openModalConfirmSignup();
+              return;
+            }
             utils.errorMessage(`${field[keys[index]]}`);
           });
           return;
         }
         setIsLoading(false);
-        utils.successMessage('Usuário logado com sucesso.');
-        setShowModalConfirmLogin(false);
+        setShowModalConfirmSignup(false);
+        setIsSignIn(true);
+        utils.successMessage('Usuário criado com sucesso.');
         return;
       })
       .catch((error) => {
-        console.log(error);
         setIsLoading(false);
-        utils.errorMessage(
-          'Ocorreram erros ao fazer a autenticação, tente novamente.'
-        );
+        console.log('error', error);
       });
   };
 
+  async function openModalConfirmSignup() {
+    await generateQrCode();
+    setShowModalConfirmSignup(!showModalConfirmSignup);
+    if (otp.every((value) => value === '')) {
+      utils.errorMessage('Código é um campo obrigatório.');
+    }
+  }
+  function closeModalConfirmSignup() {
+    setShowModalConfirmSignup(false);
+    setOtp(['', '', '', '', '', '']); // Redefinindo o estado otp para o valor inicial
+  }
   const inputsRef = otp.map(() => useRef<HTMLInputElement | null>(null));
-
   const handleOtpChange = (value: any, index: any) => {
     const newOtp = [...otp];
     newOtp[index] = value;
@@ -75,22 +102,11 @@ export function FormLogin() {
     }
   };
 
-  function openModalConfirmLogin() {
-    if (data.email === '' || data.password === '') {
-      utils.errorMessage('E-mail e senha são campos obrigatórios.');
-    } else {
-      setShowModalConfirmLogin(!showModalConfirmLogin);
-    }
-  }
-  function closeModalConfirmLogin() {
-    setShowModalConfirmLogin(false);
-  }
-
   return (
-    <div className="p-3 lg:w-2/4 bg-white lg:rounded-r-lg form-right  ">
+    <div className="p-3 lg:w-2/4 bg-white lg:rounded-r-lg form-right">
       <div className="flex items-center flex-col px-1 py-2">
         <h2 className="text-[#1A1B40] text-2xl font-bold text-center">
-          Login Account
+          Register Account
         </h2>
         <span className="text-center pt-1 text-sm">
           Lorem ipsum dolor sit amet consectetur adipisicing elit.
@@ -119,6 +135,23 @@ export function FormLogin() {
         </div>
       </div>
       <form method="POST" className="p-2">
+        <div className="flex flex-col w-100 h-100">
+          <label
+            htmlFor="name"
+            className="font-semibold text-dark py-1 text-base"
+          >
+            Nome
+          </label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            placeholder="Digite seu nome..."
+            className="p-2.5 rounded bg-[#f5f5f5] text-[#c2c2c2] outline-0"
+            onChange={handleInputChange}
+            value={data.name}
+          />
+        </div>
         <div className="flex flex-col">
           <label
             htmlFor="email"
@@ -136,7 +169,7 @@ export function FormLogin() {
             value={data.email}
           />
         </div>
-        <div className="flex flex-col ">
+        <div className="flex flex-col">
           <label
             htmlFor="password"
             className="font-semibold text-dark py-1 text-base"
@@ -146,28 +179,21 @@ export function FormLogin() {
           <input
             type="password"
             name="password"
-            autoComplete="current-password"
             id="password"
+            autoComplete="current-password"
             placeholder="Digite sua senha..."
-            className="p-2.5 rounded bg-[#f5f5f5] text-[#c2c2c2] outline-0 border"
+            className="p-2.5 rounded bg-[#f5f5f5] text-[#c2c2c2] outline-0"
             onChange={handleInputChange}
             value={data.password}
           />
         </div>
-
-        <div className="flex flex-col pt-2 text-sm space-y-4 ">
-          <Link
-            to={'#'}
-            className="text-right text-[#696eff] font-medium text-sm hover:underline"
-          >
-            Esqueceu a senha?
-          </Link>
+        <div className="flex flex-col pt-4 text-sm space-y-4 ">
           <button
             className=" w-full bg-emerald-500 rounded text-white p-3 font-semibold hover:opacity-80 shadow-sm text-base"
-            onClick={() => openModalConfirmLogin()}
             type="button"
+            onClick={() => sendSignup()}
           >
-            Logar
+            Enviar
           </button>
         </div>
         <div className="flex items-center justify-center pt-5">
@@ -176,15 +202,16 @@ export function FormLogin() {
           </span>
         </div>
       </form>
-      <ModalConfirmLogin
-        openModalConfirmLogin={showModalConfirmLogin}
-        closeModalConfirmLogin={closeModalConfirmLogin}
+      <ModalConfirmSignup
+        openModalConfirmSignup={showModalConfirmSignup}
+        closeModalConfirmSignup={closeModalConfirmSignup}
         handleOtpChange={handleOtpChange}
-        sendLogin={sendLogin}
+        sendSignup={sendSignup}
         activeInput={activeInput}
         inputsRef={inputsRef}
         otp={otp}
         loading={isLoading}
+        qrCode={qrCode}
       />
     </div>
   );

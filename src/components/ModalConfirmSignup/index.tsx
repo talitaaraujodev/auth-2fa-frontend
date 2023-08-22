@@ -1,6 +1,6 @@
-import { ModalConfirmSignupProps } from '../types/CommonTypes';
-import { Modal } from './Modal';
-import ImgStoreApp from '../assets/store-app.png';
+import { ModalConfirmSignupProps } from '../../types/CommonTypes';
+import { Modal } from '../Modal';
+import ImgStoreApp from '../../assets/store-app.png';
 
 export function ModalConfirmSignup({
   openModalConfirmSignup,
