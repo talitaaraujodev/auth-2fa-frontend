@@ -27,3 +27,9 @@ export type ModalConfirmSignupProps = {
   loading: boolean;
   qrCode: any;
 };
+export type InputOtpProps = {
+  otp: Array<string>;
+  inputsRef: any;
+  handleOtpChange: (value: string, index: number) => void;
+  activeInput: number;
+};

@@ -1,6 +1,7 @@
-import { ModalConfirmLoginProps } from '../../types/CommonTypes';
-import { Modal } from '../Modal';
 import { BiSolidLock } from 'react-icons/bi';
+import { ModalConfirmLoginProps } from '../../types/CommonTypes';
+import { InputOtp } from '../InputOtp';
+import { Modal } from '../Modal';
 
 export function ModalConfirmLogin({
   openModalConfirmLogin,
@@ -32,21 +33,12 @@ export function ModalConfirmLogin({
           autenticação.
         </span>
         <div className="flex flex-row">
-          {otp.map((digit: any, index: any) => (
-            <input
-              required
-              key={index}
-              type="text"
-              name="code"
-              maxLength={1}
-              onChange={(e) => handleOtpChange(e.target.value, index)}
-              ref={inputsRef[index]}
-              value={digit}
-              className={`h-[42px] w-[42px] text-lg text-center border-solid border border-[#dcdde1] rounded ml-2 mt-3 outline-none  ${
-                activeInput === index ? 'active' : ''
-              }`}
-            />
-          ))}
+          <InputOtp
+            otp={otp}
+            handleOtpChange={handleOtpChange}
+            activeInput={activeInput}
+            inputsRef={inputsRef}
+          />
         </div>
         <button
           className="w-36 bg-emerald-500 rounded text-white p-2 mt-4 font-semibold text-center hover:opacity-80  text-base"

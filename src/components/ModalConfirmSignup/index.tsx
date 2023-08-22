@@ -1,5 +1,6 @@
 import { ModalConfirmSignupProps } from '../../types/CommonTypes';
 import { Modal } from '../Modal';
+import { InputOtp } from '../InputOtp';
 import ImgStoreApp from '../../assets/store-app.png';
 
 export function ModalConfirmSignup({
@@ -49,21 +50,12 @@ export function ModalConfirmSignup({
           Digite o PIN gerado
         </label>
         <div className="flex flex-row">
-          {otp.map((digit: any, index: any) => (
-            <input
-              required
-              key={index}
-              type="text"
-              name="code"
-              maxLength={1}
-              onChange={(e) => handleOtpChange(e.target.value, index)}
-              ref={inputsRef[index]}
-              value={digit}
-              className={`h-[42px] w-[42px] text-lg text-center border-solid border border-[#dcdde1] rounded mr-2 mt-3 outline-none  ${
-                activeInput === index ? 'active' : ''
-              }`}
-            />
-          ))}
+          <InputOtp
+            otp={otp}
+            handleOtpChange={handleOtpChange}
+            activeInput={activeInput}
+            inputsRef={inputsRef}
+          />
         </div>
         <button
           className="w-36 bg-emerald-500 rounded text-white p-2 mt-4 font-semibold text-center hover:opacity-80  text-base"
